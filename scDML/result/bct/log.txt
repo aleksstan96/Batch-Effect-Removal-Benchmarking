@@ -1,0 +1,205 @@
+2023-08-02 07:36:49,883 - root - INFO - Create log file....
+2023-08-02 07:36:49,885 - root - INFO - Create scDMLModel Object Done....
+2023-08-02 07:37:05,467 - root - INFO - Running preprocess() function...
+2023-08-02 07:37:05,469 - root - INFO - mode=unsupervised
+2023-08-02 07:37:05,470 - root - INFO - clustering method=louvain
+2023-08-02 07:37:05,470 - root - INFO - resolution=3.0
+2023-08-02 07:37:05,472 - root - INFO - BATCH_key=BATCH
+2023-08-02 07:37:05,473 - root - INFO - Normalize counts per cell(sum=10000.0)
+2023-08-02 07:37:05,763 - root - INFO - Log1p data
+2023-08-02 07:37:06,092 - root - INFO - Select HVG(n_top_genes=1000)
+2023-08-02 07:37:08,820 - root - INFO - Scale batch(scale_value=10.0)
+2023-08-02 07:37:09,322 - root - INFO - Calculate PCA(n_comps=100)
+2023-08-02 07:37:17,710 - root - INFO - Apply louvain clustring(resolution=3.0) initization
+2023-08-02 07:37:17,712 - root - INFO - Number of Cluster =35
+2023-08-02 07:37:17,713 - root - INFO - clusters=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
+2023-08-02 07:37:17,716 - root - INFO - Preprocess Dataset Done...
+2023-08-02 07:46:51,107 - root - INFO - K_in=5,K_bw=10
+2023-08-02 07:46:51,109 - root - INFO - Calculate similarity of cluster with KNN and MNN
+2023-08-02 07:46:51,110 - root - INFO - appoximate calculate KNN Pair intra batch...
+2023-08-02 07:46:51,118 - root - INFO - Calculate KNN pair intra batch...........
+2023-08-02 07:46:51,119 - root - INFO - K=5
+2023-08-02 07:46:51,120 - root - INFO - metric=cosine
+2023-08-02 07:46:51,121 - root - INFO - Processing datasets: (0, 0) = ('celseq', 'celseq')
+2023-08-02 07:46:51,631 - root - INFO - There are (6636) KNN pairs when processing (0, 0)=('celseq', 'celseq')
+2023-08-02 07:46:51,633 - root - INFO - Processing datasets: (1, 1) = ('celseq2', 'celseq2')
+2023-08-02 07:46:51,835 - root - INFO - There are (15266) KNN pairs when processing (1, 1)=('celseq2', 'celseq2')
+2023-08-02 07:46:51,836 - root - INFO - Processing datasets: (2, 2) = ('fluidigmc1', 'fluidigmc1')
+2023-08-02 07:46:51,902 - root - INFO - There are (4022) KNN pairs when processing (2, 2)=('fluidigmc1', 'fluidigmc1')
+2023-08-02 07:46:51,903 - root - INFO - Processing datasets: (3, 3) = ('inDrop1', 'inDrop1')
+2023-08-02 07:46:52,065 - root - INFO - There are (12568) KNN pairs when processing (3, 3)=('inDrop1', 'inDrop1')
+2023-08-02 07:46:52,066 - root - INFO - Processing datasets: (4, 4) = ('inDrop2', 'inDrop2')
+2023-08-02 07:46:52,199 - root - INFO - There are (11048) KNN pairs when processing (4, 4)=('inDrop2', 'inDrop2')
+2023-08-02 07:46:52,201 - root - INFO - Processing datasets: (5, 5) = ('inDrop3', 'inDrop3')
+2023-08-02 07:46:52,476 - root - INFO - There are (24068) KNN pairs when processing (5, 5)=('inDrop3', 'inDrop3')
+2023-08-02 07:46:52,477 - root - INFO - Processing datasets: (6, 6) = ('inDrop4', 'inDrop4')
+2023-08-02 07:46:52,577 - root - INFO - There are (8364) KNN pairs when processing (6, 6)=('inDrop4', 'inDrop4')
+2023-08-02 07:46:52,578 - root - INFO - Processing datasets: (7, 7) = ('smarter', 'smarter')
+2023-08-02 07:46:52,697 - root - INFO - There are (9544) KNN pairs when processing (7, 7)=('smarter', 'smarter')
+2023-08-02 07:46:52,698 - root - INFO - Processing datasets: (8, 8) = ('smartseq2', 'smartseq2')
+2023-08-02 07:46:52,879 - root - INFO - There are (15860) KNN pairs when processing (8, 8)=('smartseq2', 'smartseq2')
+2023-08-02 07:46:52,880 - root - INFO - scDML finds (107376) KNN pairs in dataset finally
+2023-08-02 07:46:52,977 - root - INFO - appoximate calculate MNN Pair inter batch...
+2023-08-02 07:46:52,986 - root - INFO - Calculate MNN pair inter batch...........
+2023-08-02 07:46:52,987 - root - INFO - K=10
+2023-08-02 07:46:52,988 - root - INFO - metric=cosine
+2023-08-02 07:46:52,989 - root - INFO - Processing datasets: (0, 1) = ('celseq', 'celseq2')
+2023-08-02 07:46:53,116 - root - INFO - There are (8708) MNN pairs when processing (0, 1)=('celseq', 'celseq2')
+2023-08-02 07:46:53,117 - root - INFO - Processing datasets: (0, 2) = ('celseq', 'fluidigmc1')
+2023-08-02 07:46:53,189 - root - INFO - There are (4454) MNN pairs when processing (0, 2)=('celseq', 'fluidigmc1')
+2023-08-02 07:46:53,189 - root - INFO - Processing datasets: (0, 3) = ('celseq', 'inDrop1')
+2023-08-02 07:46:53,298 - root - INFO - There are (7244) MNN pairs when processing (0, 3)=('celseq', 'inDrop1')
+2023-08-02 07:46:53,299 - root - INFO - Processing datasets: (0, 4) = ('celseq', 'inDrop2')
+2023-08-02 07:46:53,429 - root - INFO - There are (7622) MNN pairs when processing (0, 4)=('celseq', 'inDrop2')
+2023-08-02 07:46:53,430 - root - INFO - Processing datasets: (0, 5) = ('celseq', 'inDrop3')
+2023-08-02 07:46:53,643 - root - INFO - There are (8976) MNN pairs when processing (0, 5)=('celseq', 'inDrop3')
+2023-08-02 07:46:53,644 - root - INFO - Processing datasets: (0, 6) = ('celseq', 'inDrop4')
+2023-08-02 07:46:53,752 - root - INFO - There are (7342) MNN pairs when processing (0, 6)=('celseq', 'inDrop4')
+2023-08-02 07:46:53,754 - root - INFO - Processing datasets: (0, 7) = ('celseq', 'smarter')
+2023-08-02 07:46:53,909 - root - INFO - There are (7104) MNN pairs when processing (0, 7)=('celseq', 'smarter')
+2023-08-02 07:46:53,910 - root - INFO - Processing datasets: (0, 8) = ('celseq', 'smartseq2')
+2023-08-02 07:46:54,054 - root - INFO - There are (8554) MNN pairs when processing (0, 8)=('celseq', 'smartseq2')
+2023-08-02 07:46:54,056 - root - INFO - Processing datasets: (1, 2) = ('celseq2', 'fluidigmc1')
+2023-08-02 07:46:54,213 - root - INFO - There are (6746) MNN pairs when processing (1, 2)=('celseq2', 'fluidigmc1')
+2023-08-02 07:46:54,214 - root - INFO - Processing datasets: (1, 3) = ('celseq2', 'inDrop1')
+2023-08-02 07:46:54,441 - root - INFO - There are (12170) MNN pairs when processing (1, 3)=('celseq2', 'inDrop1')
+2023-08-02 07:46:54,442 - root - INFO - Processing datasets: (1, 4) = ('celseq2', 'inDrop2')
+2023-08-02 07:46:54,639 - root - INFO - There are (13194) MNN pairs when processing (1, 4)=('celseq2', 'inDrop2')
+2023-08-02 07:46:54,640 - root - INFO - Processing datasets: (1, 5) = ('celseq2', 'inDrop3')
+2023-08-02 07:46:54,929 - root - INFO - There are (13806) MNN pairs when processing (1, 5)=('celseq2', 'inDrop3')
+2023-08-02 07:46:54,930 - root - INFO - Processing datasets: (1, 6) = ('celseq2', 'inDrop4')
+2023-08-02 07:46:55,119 - root - INFO - There are (10826) MNN pairs when processing (1, 6)=('celseq2', 'inDrop4')
+2023-08-02 07:46:55,120 - root - INFO - Processing datasets: (1, 7) = ('celseq2', 'smarter')
+2023-08-02 07:46:55,319 - root - INFO - There are (10388) MNN pairs when processing (1, 7)=('celseq2', 'smarter')
+2023-08-02 07:46:55,320 - root - INFO - Processing datasets: (1, 8) = ('celseq2', 'smartseq2')
+2023-08-02 07:46:55,543 - root - INFO - There are (14080) MNN pairs when processing (1, 8)=('celseq2', 'smartseq2')
+2023-08-02 07:46:55,544 - root - INFO - Processing datasets: (2, 3) = ('fluidigmc1', 'inDrop1')
+2023-08-02 07:46:55,676 - root - INFO - There are (6980) MNN pairs when processing (2, 3)=('fluidigmc1', 'inDrop1')
+2023-08-02 07:46:55,677 - root - INFO - Processing datasets: (2, 4) = ('fluidigmc1', 'inDrop2')
+2023-08-02 07:46:55,817 - root - INFO - There are (7046) MNN pairs when processing (2, 4)=('fluidigmc1', 'inDrop2')
+2023-08-02 07:46:55,818 - root - INFO - Processing datasets: (2, 5) = ('fluidigmc1', 'inDrop3')
+2023-08-02 07:46:56,016 - root - INFO - There are (7484) MNN pairs when processing (2, 5)=('fluidigmc1', 'inDrop3')
+2023-08-02 07:46:56,017 - root - INFO - Processing datasets: (2, 6) = ('fluidigmc1', 'inDrop4')
+2023-08-02 07:46:56,154 - root - INFO - There are (6548) MNN pairs when processing (2, 6)=('fluidigmc1', 'inDrop4')
+2023-08-02 07:46:56,156 - root - INFO - Processing datasets: (2, 7) = ('fluidigmc1', 'smarter')
+2023-08-02 07:46:56,287 - root - INFO - There are (7472) MNN pairs when processing (2, 7)=('fluidigmc1', 'smarter')
+2023-08-02 07:46:56,288 - root - INFO - Processing datasets: (2, 8) = ('fluidigmc1', 'smartseq2')
+2023-08-02 07:46:56,473 - root - INFO - There are (6936) MNN pairs when processing (2, 8)=('fluidigmc1', 'smartseq2')
+2023-08-02 07:46:56,474 - root - INFO - Processing datasets: (3, 4) = ('inDrop1', 'inDrop2')
+2023-08-02 07:46:56,644 - root - INFO - There are (11500) MNN pairs when processing (3, 4)=('inDrop1', 'inDrop2')
+2023-08-02 07:46:56,645 - root - INFO - Processing datasets: (3, 5) = ('inDrop1', 'inDrop3')
+2023-08-02 07:46:56,913 - root - INFO - There are (15430) MNN pairs when processing (3, 5)=('inDrop1', 'inDrop3')
+2023-08-02 07:46:56,915 - root - INFO - Processing datasets: (3, 6) = ('inDrop1', 'inDrop4')
+2023-08-02 07:46:57,101 - root - INFO - There are (11254) MNN pairs when processing (3, 6)=('inDrop1', 'inDrop4')
+2023-08-02 07:46:57,102 - root - INFO - Processing datasets: (3, 7) = ('inDrop1', 'smarter')
+2023-08-02 07:46:57,316 - root - INFO - There are (10146) MNN pairs when processing (3, 7)=('inDrop1', 'smarter')
+2023-08-02 07:46:57,317 - root - INFO - Processing datasets: (3, 8) = ('inDrop1', 'smartseq2')
+2023-08-02 07:46:57,571 - root - INFO - There are (10962) MNN pairs when processing (3, 8)=('inDrop1', 'smartseq2')
+2023-08-02 07:46:57,572 - root - INFO - Processing datasets: (4, 5) = ('inDrop2', 'inDrop3')
+2023-08-02 07:46:57,860 - root - INFO - There are (13638) MNN pairs when processing (4, 5)=('inDrop2', 'inDrop3')
+2023-08-02 07:46:57,861 - root - INFO - Processing datasets: (4, 6) = ('inDrop2', 'inDrop4')
+2023-08-02 07:46:58,073 - root - INFO - There are (10952) MNN pairs when processing (4, 6)=('inDrop2', 'inDrop4')
+2023-08-02 07:46:58,074 - root - INFO - Processing datasets: (4, 7) = ('inDrop2', 'smarter')
+2023-08-02 07:46:58,334 - root - INFO - There are (10822) MNN pairs when processing (4, 7)=('inDrop2', 'smarter')
+2023-08-02 07:46:58,335 - root - INFO - Processing datasets: (4, 8) = ('inDrop2', 'smartseq2')
+2023-08-02 07:46:58,613 - root - INFO - There are (13566) MNN pairs when processing (4, 8)=('inDrop2', 'smartseq2')
+2023-08-02 07:46:58,614 - root - INFO - Processing datasets: (5, 6) = ('inDrop3', 'inDrop4')
+2023-08-02 07:46:58,900 - root - INFO - There are (11954) MNN pairs when processing (5, 6)=('inDrop3', 'inDrop4')
+2023-08-02 07:46:58,901 - root - INFO - Processing datasets: (5, 7) = ('inDrop3', 'smarter')
+2023-08-02 07:46:59,259 - root - INFO - There are (12586) MNN pairs when processing (5, 7)=('inDrop3', 'smarter')
+2023-08-02 07:46:59,261 - root - INFO - Processing datasets: (5, 8) = ('inDrop3', 'smartseq2')
+2023-08-02 07:46:59,653 - root - INFO - There are (14198) MNN pairs when processing (5, 8)=('inDrop3', 'smartseq2')
+2023-08-02 07:46:59,656 - root - INFO - Processing datasets: (6, 7) = ('inDrop4', 'smarter')
+2023-08-02 07:46:59,882 - root - INFO - There are (8786) MNN pairs when processing (6, 7)=('inDrop4', 'smarter')
+2023-08-02 07:46:59,883 - root - INFO - Processing datasets: (6, 8) = ('inDrop4', 'smartseq2')
+2023-08-02 07:47:00,128 - root - INFO - There are (10414) MNN pairs when processing (6, 8)=('inDrop4', 'smartseq2')
+2023-08-02 07:47:00,129 - root - INFO - Processing datasets: (7, 8) = ('smarter', 'smartseq2')
+2023-08-02 07:47:00,427 - root - INFO - There are (10358) MNN pairs when processing (7, 8)=('smarter', 'smartseq2')
+2023-08-02 07:47:00,429 - root - INFO - scDML finds (360246) MNN pairs in dataset finally
+2023-08-02 07:47:01,581 - root - INFO - Find All Nearest Neighbours Done....
+2023-08-02 07:47:01,582 - root - INFO - calculate similarity matrix between cluster
+2023-08-02 07:47:01,701 - root - INFO - delete inner edge which link same cluster
+2023-08-02 07:47:01,703 - root - INFO - 13530 knn pair in batch link different cluster
+2023-08-02 07:47:01,865 - root - INFO - delete inner edge which link same cluster
+2023-08-02 07:47:01,869 - root - INFO - 230202 mnn pair in batch link different cluster
+2023-08-02 07:47:01,870 - root - INFO - ===================================================================================
+2023-08-02 07:47:01,871 - root - INFO - NN pair ratio(number of MNN pairs/number of KNN pairs)=17.01419068736142
+2023-08-02 07:47:01,872 - root - INFO - ===================================================================================
+2023-08-02 07:47:01,876 - root - INFO - save cor matrix to file....
+2023-08-02 07:47:01,880 - root - INFO - save nn pair matrix to file
+2023-08-02 07:47:01,882 - root - INFO - Calculate Similarity Matrix Done....
+2023-08-02 07:47:02,691 - root - INFO - Build Embedding Net for scDML training
+2023-08-02 07:47:02,728 - root - INFO - EmbeddingNet(
+  (actn): ReLU()
+  (fc): Sequential(
+    (0): Linear(in_features=1000, out_features=256, bias=True)
+    (1): ReLU()
+    (2): Linear(in_features=256, out_features=32, bias=True)
+  )
+)
+2023-08-02 07:47:02,729 - root - INFO - Build Embedding Net Done...
+2023-08-02 08:07:36,400 - root - INFO - expect_num_cluster is None, use eigen value gap to estimate the number of celltype......
+2023-08-02 08:07:36,828 - root - INFO - Optimal number of clusters [ 6  4  9 12  3]
+2023-08-02 08:07:36,829 - root - INFO - scDML can't find the mering result of cluster=6 ,you can run merge_cluster(fixed_ncluster=6) function to get this
+2023-08-02 08:09:22,815 - root - INFO - scDML can't find the mering result of cluster=14 ,you can run merge_cluster(fixed_ncluster=14) function to get this
+2023-08-02 08:09:41,654 - root - INFO - scDML can't find the mering result of cluster=[14] ,you can run merge_cluster(fixed_ncluster=[14]) function to get this
+2023-08-02 08:09:59,751 - root - INFO - scDML merge cluster with rule2....
+2023-08-02 08:09:59,754 - root - INFO - merge_rule2....
+2023-08-02 08:10:00,148 - root - INFO - merging cluster set:[{3}, {5}, {8}, {14}, {20}, {24}, {25}, {30}, {34}, {1, 19, 28, 17}, {26, 10, 23, 31}, {16, 29}, {0, 33, 2, 4, 12, 15, 18, 21, 22, 27}, {32, 6, 7, 9, 11, 13}]
+2023-08-02 08:10:07,324 - root - INFO - train scDML(expect_num_cluster=14) with Embedding Net
+2023-08-02 08:10:07,325 - root - INFO - expect_num_cluster=14
+2023-08-02 08:10:07,330 - root - INFO - using CPU to train model
+2023-08-02 08:10:07,345 - root - INFO - use euclidean distance and hard triplet to train model
+2023-08-02 08:10:07,347 - root - INFO - not use earlystopping!!!!
+2023-08-02 08:10:09,305 - root - INFO - epoch=1,number_hard_triplet=205434
+2023-08-02 08:10:11,250 - root - INFO - epoch=2,number_hard_triplet=90864
+2023-08-02 08:10:12,842 - root - INFO - epoch=3,number_hard_triplet=53670
+2023-08-02 08:10:15,069 - root - INFO - epoch=4,number_hard_triplet=34291
+2023-08-02 08:10:17,164 - root - INFO - epoch=5,number_hard_triplet=24992
+2023-08-02 08:10:19,087 - root - INFO - epoch=6,number_hard_triplet=19164
+2023-08-02 08:10:21,443 - root - INFO - epoch=7,number_hard_triplet=15584
+2023-08-02 08:10:23,391 - root - INFO - epoch=8,number_hard_triplet=10555
+2023-08-02 08:10:25,059 - root - INFO - epoch=9,number_hard_triplet=8319
+2023-08-02 08:10:26,510 - root - INFO - epoch=10,number_hard_triplet=5713
+2023-08-02 08:10:28,946 - root - INFO - epoch=11,number_hard_triplet=5713
+2023-08-02 08:10:30,682 - root - INFO - epoch=12,number_hard_triplet=4729
+2023-08-02 08:10:32,572 - root - INFO - epoch=13,number_hard_triplet=3024
+2023-08-02 08:10:34,252 - root - INFO - epoch=14,number_hard_triplet=2361
+2023-08-02 08:10:35,848 - root - INFO - epoch=15,number_hard_triplet=3017
+2023-08-02 08:10:37,717 - root - INFO - epoch=16,number_hard_triplet=1819
+2023-08-02 08:10:39,253 - root - INFO - epoch=17,number_hard_triplet=1362
+2023-08-02 08:10:40,877 - root - INFO - epoch=18,number_hard_triplet=1266
+2023-08-02 08:10:42,320 - root - INFO - epoch=19,number_hard_triplet=1059
+2023-08-02 08:10:43,482 - root - INFO - epoch=20,number_hard_triplet=1008
+2023-08-02 08:10:45,022 - root - INFO - epoch=21,number_hard_triplet=1066
+2023-08-02 08:10:46,501 - root - INFO - epoch=22,number_hard_triplet=918
+2023-08-02 08:10:47,790 - root - INFO - epoch=23,number_hard_triplet=703
+2023-08-02 08:10:49,179 - root - INFO - epoch=24,number_hard_triplet=603
+2023-08-02 08:10:50,804 - root - INFO - epoch=25,number_hard_triplet=627
+2023-08-02 08:10:52,065 - root - INFO - epoch=26,number_hard_triplet=456
+2023-08-02 08:10:53,636 - root - INFO - epoch=27,number_hard_triplet=562
+2023-08-02 08:10:55,204 - root - INFO - epoch=28,number_hard_triplet=365
+2023-08-02 08:10:56,795 - root - INFO - epoch=29,number_hard_triplet=455
+2023-08-02 08:10:58,731 - root - INFO - epoch=30,number_hard_triplet=467
+2023-08-02 08:11:00,113 - root - INFO - epoch=31,number_hard_triplet=414
+2023-08-02 08:11:01,960 - root - INFO - epoch=32,number_hard_triplet=306
+2023-08-02 08:11:03,582 - root - INFO - epoch=33,number_hard_triplet=353
+2023-08-02 08:11:05,337 - root - INFO - epoch=34,number_hard_triplet=338
+2023-08-02 08:11:06,801 - root - INFO - epoch=35,number_hard_triplet=348
+2023-08-02 08:11:08,322 - root - INFO - epoch=36,number_hard_triplet=407
+2023-08-02 08:11:09,954 - root - INFO - epoch=37,number_hard_triplet=259
+2023-08-02 08:11:11,488 - root - INFO - epoch=38,number_hard_triplet=239
+2023-08-02 08:11:13,390 - root - INFO - epoch=39,number_hard_triplet=184
+2023-08-02 08:11:14,974 - root - INFO - epoch=40,number_hard_triplet=251
+2023-08-02 08:11:16,922 - root - INFO - epoch=41,number_hard_triplet=222
+2023-08-02 08:11:18,855 - root - INFO - epoch=42,number_hard_triplet=316
+2023-08-02 08:11:20,460 - root - INFO - epoch=43,number_hard_triplet=317
+2023-08-02 08:11:22,107 - root - INFO - epoch=44,number_hard_triplet=262
+2023-08-02 08:11:23,863 - root - INFO - epoch=45,number_hard_triplet=259
+2023-08-02 08:11:25,839 - root - INFO - epoch=46,number_hard_triplet=186
+2023-08-02 08:11:27,550 - root - INFO - epoch=47,number_hard_triplet=265
+2023-08-02 08:11:28,801 - root - INFO - epoch=48,number_hard_triplet=145
+2023-08-02 08:11:30,913 - root - INFO - epoch=49,number_hard_triplet=163
+2023-08-02 08:11:32,569 - root - INFO - epoch=50,number_hard_triplet=181
+2023-08-02 08:11:32,570 - root - INFO - scDML training done....
+2023-08-02 08:11:32,572 - root - INFO - extract embedding for dataset with trained network
