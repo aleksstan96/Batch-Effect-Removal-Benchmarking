@@ -45,7 +45,7 @@ def preprocessing(adata: ad.AnnData, scale=True, norm_total=True, log1p=True, pc
                 sep_batch=temp_ad[temp_ad.obs[batch_key]==batch].copy()
                 sc.pp.scale(sep_batch,max_value=scale_value)
                 adata_sep.append(sep_batch)
-            temp_ad=sc.AnnData.concatenate(*adata_sep)
+            temp_ad=ad.concat(adata_sep)
         
     if pca:
         # by default uses calculated HVGs
@@ -77,8 +77,13 @@ def clustering(adata: ad.AnnData, cluster_method="louvain", use_rep='X_pca', res
     return temp_ad
 
 
-def call_harmony(adata: ad.AnnData, label_name='Harmony_emb', batch_key='batch'):
-    print("Harmony...")
+def call_harmony(adata: ad.AnnData, label_name='Harmony_emb', batch_key='batch', scale_merged=False):
+    
+    if scale_merged:
+        sc.pp.scale(adata)
+    sc.tl.pca(adata)
+
+    print("Harmony...")     
     t_init = time.process_time()
     adata.obsm[label_name] = harmonize(adata.obsm["X_pca"], adata.obs, batch_key=batch_key)
     t_fin = time.process_time()
