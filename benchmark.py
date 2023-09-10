@@ -91,7 +91,7 @@ def call_harmony(adata: ad.AnnData, label_name='Harmony_emb', batch_key='batch',
     exe_time = t_fin-t_init
     return adata, exe_time
 
-def call_scDML(adata: ad.AnnData, label_name='scDML_emb', verbose=False, initial_res=3.0, n_comps=50, save_dir='./test_result/', batch_key='batch', ncluster=14, ncluster_list=[14], merge_rule="rule2"):
+def call_scDML(adata: ad.AnnData, label_name='scDML_emb', verbose=False, initial_res=3.0, n_comps=50, hvgs=True, save_dir='./test_result/', batch_key='batch', ncluster=14, ncluster_list=[14], merge_rule="rule2"):
 
     import scDML
     from scDML import scDMLModel
@@ -100,13 +100,19 @@ def call_scDML(adata: ad.AnnData, label_name='scDML_emb', verbose=False, initial
     print("scDML...")
 
     temp_ad = adata.copy()
+    temp_ad.obs['BATCH'] = temp_ad.obs[batch_key]
+    # get calculated HVGs
+    if hvgs:
+        hvg_list = list(temp_ad.var[temp_ad.var.highly_variable].index.values)
+    else:
+        hvg_list = list(temp_ad.var.index.values)
 
     scdml=scDMLModel(verbose=verbose, save_dir=save_dir)
     # since normalization, log1p, HVGs extraction and scaling were performed in the previous steps, we only let preprocess function to perform PCA
-    adt = scdml.preprocess(temp_ad, cluster_method="louvain", resolution=initial_res, pca_dim=n_comps, normalize_samples=False, normalize_features=False, log_normalize=False, batch_key=batch_key)
+    adt = scdml.preprocess(temp_ad, cluster_method="louvain", resolution=initial_res, pca_dim=n_comps, hvg_list=hvg_list, normalize_samples=False, normalize_features=False, log_normalize=False, batch_key='BATCH')
     # only measure time for integrate function
     t_init = time.process_time()
-    scdml.integrate(adt, batch_key=batch_key, ncluster_list=ncluster_list, expect_num_cluster=ncluster,merge_rule=merge_rule)
+    scdml.integrate(adt, batch_key='BATCH', ncluster_list=ncluster_list, expect_num_cluster=ncluster,merge_rule=merge_rule)
     t_fin = time.process_time()
     print(f'scDML integrate ran for: {t_fin-t_init} s')
     temp_ad.obsm[label_name] = adt.obsm["X_emb"]
@@ -191,8 +197,8 @@ def call_scVI(adata: ad.AnnData, label_name='scVI_emb', batch_key='batch', max_e
     train_kwargs = {"train_size": 1.0}
     if max_epochs is not None:
         train_kwargs["max_epochs"] = max_epochs
-    t_fin = time.process_time()
     vae.train(**train_kwargs)
+    t_fin = time.process_time()
     adata.obsm[label_name] = vae.get_latent_representation()
 
     exe_time = t_fin-t_init
@@ -201,7 +207,7 @@ def call_scVI(adata: ad.AnnData, label_name='scVI_emb', batch_key='batch', max_e
 
 def save_results_to_dataframe(dataset, algorithm, hvgs, scaled_batch, scaled_total, graph_iLISI, graph_cLISI, ARI, NMI, exe_time, dataframe=None, path='/goofys/users/Aleksandra_S/benchmarking_datasets/results/', file_name_sufix = ''):
     
-    file_path = path + 'result_table_test.csv'
+    file_path = path + 'result_table.csv'
 
     if dataframe is None:
         if os.path.exists(file_path):
@@ -246,16 +252,19 @@ def main(path, params):
     # calling batch-removal method
     if params.get('algo').lower()=='harmony':
         adata, exe_time = call_harmony(adata, batch_key=params.get('batch_key'), n_comps=params.get('n_comps'), label_name=use_rep)
+        print('Anndata after integration: ', adata)
     elif params.get('algo').lower()=='scdml':
-        adata, exe_time = call_scDML(adata, batch_key=params.get('batch_key'), n_comps=params.get('n_comps'), label_name=use_rep)
+        adata, exe_time = call_scDML(adata, batch_key=params.get('batch_key'), n_comps=params.get('n_comps'), label_name=use_rep, hvgs=params.get('hvgs'))
+        print('Anndata after integration: ', adata)
     elif params.get('algo').lower()=='liger':
         # for liger we should not perform scaling (it will perform its own without zero-centering the data)
         adata, exe_time = call_liger(adata, batch_key=params.get('batch_key'), label_name=use_rep, hvgs=params.get('hvgs'))
+        print('Anndata after integration: ', adata)
     elif params.get('algo').lower()=='scvi':
         # scVI models raw counts directly, so it is important that we provide it with a count matrix rather than a normalized expression matrix.
         # for scVI we should perform no scaling
         adata, exe_time = call_scVI(adata, batch_key=params.get('batch_key'), label_name=use_rep, raw_count_layer='counts', hvgs=params.get('hvgs'))
-
+        print('Anndata after integration: ', adata)
     # performing clustering
     # resolutions = np.arange(params.get('resolutions_min'), params.get('resolutions_max'), params.get('resolutions_step'))
     # for r in resolutions:
@@ -272,7 +281,10 @@ def main(path, params):
     print(f"NMI = {nmi}")
     print(f"cLISI = {clisi}")
 
-    ilisi = scib.me.ilisi_graph(adata, batch_key=params.get('batch_key'), type_="embed", use_rep=use_rep, k0=graph_ilisi_k0)
+    if params.get('algo').lower()=='scdml':
+        ilisi = scib.me.ilisi_graph(adata, batch_key='BATCH', type_="embed", use_rep=use_rep, k0=graph_ilisi_k0)
+    else:
+        ilisi = scib.me.ilisi_graph(adata, batch_key=params.get('batch_key'), type_="embed", use_rep=use_rep, k0=graph_ilisi_k0)
     print(f"iLISI={ilisi}")
 
     print("Final andata:")
@@ -285,8 +297,8 @@ def main(path, params):
 if __name__ == "__main__":
     params_list = [
     {
-        'algo' : 'scVI',
-        'dataset' : 'Human_pancreas_norm_complexBatch',
+        'algo' : 'scDML',
+        'dataset' : 'Lung_atlas_public',
         'hvgs' : False,
         'flavor' : 'cell_ranger',
         'scale' : False,
@@ -299,34 +311,34 @@ if __name__ == "__main__":
         'resolutions_step' : 0.1,
         'reso' : 1,
         'clust_algo' : 'louvain',
-        'batch_key' : 'tech',
-        'cell_type_key' : 'celltype',
-        'n_comps' : 20,
-        'graph_ilisi_k0' : 31,
+        'batch_key' : 'batch',
+        'cell_type_key' : 'cell_type',
+        'n_comps' : 30,
+        'graph_ilisi_k0' : 63,
     },
-    # {
-    #     'algo' : 'scVI',
-    #     'dataset' : 'Human_pancreas_norm_complexBatch',
-    #     'hvgs' : False,
-    #     'flavor' : 'cell_ranger',
-    #     'scale' : True,
-    #     'scale_total' : False,
-    #     'norm_total' : False,
-    #     'log1p' : False,
-    #     'pca' : False,
-    #     'resolutions_min' : 0.1,
-    #     'resolutions_max' : 1.1,
-    #     'resolutions_step' : 0.1,
-    #     'reso' : 1,
-    #     'clust_algo' : 'louvain',
-    #     'batch_key' : 'tech',
-    #     'cell_type_key' : 'celltype',
-    #     'n_comps' : 20,
-    #     'graph_ilisi_k0' : 31,
-    # },
     {
-        'algo' : 'scVI',
-        'dataset' : 'Human_pancreas_norm_complexBatch',
+        'algo' : 'scDML',
+        'dataset' : 'Lung_atlas_public',
+        'hvgs' : False,
+        'flavor' : 'cell_ranger',
+        'scale' : True,
+        'scale_total' : False,
+        'norm_total' : False,
+        'log1p' : False,
+        'pca' : False,
+        'resolutions_min' : 0.1,
+        'resolutions_max' : 1.1,
+        'resolutions_step' : 0.1,
+        'reso' : 1,
+        'clust_algo' : 'louvain',
+        'batch_key' : 'batch',
+        'cell_type_key' : 'cell_type',
+        'n_comps' : 30,
+        'graph_ilisi_k0' : 63,
+    },
+    {
+        'algo' : 'scDML',
+        'dataset' : 'Lung_atlas_public',
         'hvgs' : True,
         'flavor' : 'cell_ranger',
         'scale' : False,
@@ -339,37 +351,37 @@ if __name__ == "__main__":
         'resolutions_step' : 0.1,
         'reso' : 1,
         'clust_algo' : 'louvain',
-        'batch_key' : 'tech',
-        'cell_type_key' : 'celltype',
-        'n_comps' : 20,
-        'graph_ilisi_k0' : 31,
+        'batch_key' : 'batch',
+        'cell_type_key' : 'cell_type',
+        'n_comps' : 30,
+        'graph_ilisi_k0' : 63,
     },
-    # {
-    #     'algo' : 'scVI',
-    #     'dataset' : 'Human_pancreas_norm_complexBatch',
-    #     'hvgs' : True,
-    #     'flavor' : 'cell_ranger',
-    #     'scale' : True,
-    #     'scale_total' : False,
-    #     'norm_total' : False,
-    #     'log1p' : False,
-    #     'pca' : False,
-    #     'resolutions_min' : 0.1,
-    #     'resolutions_max' : 1.1,
-    #     'resolutions_step' : 0.1,
-    #     'reso' : 1,
-    #     'clust_algo' : 'louvain',
-    #     'batch_key' : 'tech',
-    #     'cell_type_key' : 'celltype',
-    #     'n_comps' : 20,
-    #     'graph_ilisi_k0' : 31,
-    # },
+    {
+        'algo' : 'scDML',
+        'dataset' : 'Lung_atlas_public',
+        'hvgs' : True,
+        'flavor' : 'cell_ranger',
+        'scale' : True,
+        'scale_total' : False,
+        'norm_total' : False,
+        'log1p' : False,
+        'pca' : False,
+        'resolutions_min' : 0.1,
+        'resolutions_max' : 1.1,
+        'resolutions_step' : 0.1,
+        'reso' : 1,
+        'clust_algo' : 'louvain',
+        'batch_key' : 'batch',
+        'cell_type_key' : 'cell_type',
+        'n_comps' : 30,
+        'graph_ilisi_k0' : 63,
+    },
     ]
 
     t_init = time.process_time()
     for params in params_list:
         main(
-            '/goofys/users/Aleksandra_S/benchmarking_datasets/human_pancreas_norm_complexBatch.h5ad', params
+            '/goofys/users/Aleksandra_S/benchmarking_datasets/Lung_atlas_public.h5ad', params
         )
     t_fin = time.process_time()
     print(f'Total time = {t_fin-t_init} s')
