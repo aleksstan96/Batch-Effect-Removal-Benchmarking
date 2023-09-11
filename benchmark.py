@@ -30,6 +30,7 @@ def preprocessing(adata: ad.AnnData,  hvgs, scale, scale_total, norm_total=False
     # HVG-ovi se racunaju po batch-u! subset ne mora da se uzima jer PCA po defaultu radi samo nad HVG-ovima ako su izracunati
     if hvgs:
         sc.pp.highly_variable_genes(temp_ad, n_top_genes=n_high_var, flavor=flavor, batch_key=batch_key, n_bins=20)
+        temp_highly_variable = temp_ad.var.highly_variable.copy()
 
     # scale se radi po batch-u!
     if scale: 
@@ -46,6 +47,10 @@ def preprocessing(adata: ad.AnnData,  hvgs, scale, scale_total, norm_total=False
 
     if scale_total:
         sc.pp.scale(temp_ad,max_value=scale_value)
+
+    # assign calculated HVGs (in case scale function has removed them)
+    if hvgs:
+        temp_ad.var['highly_variable'] = temp_highly_variable
         
     if pca:
         # by default uses calculated HVGs
@@ -67,11 +72,11 @@ def clustering(adata: ad.AnnData, cluster_method="louvain", use_rep='X_pca', res
             sc.pp.neighbors(temp_ad, use_rep=use_rep,random_state=0)
         sc.tl.louvain(temp_ad,resolution=reso,key_added=cluster_method)
 
-    elif(cluster_method=="kmeans"):
-        X_pca = temp_ad.obsm[use_rep] 
-        kmeans = KMeans(n_clusters=num_cluster, random_state=0).fit(X_pca) 
-        temp_ad.obs['kmeans'] = kmeans.labels_.astype(str)
-        temp_ad.obs['kmeans'] = temp_ad.obs['kmeans'].astype("category")   
+    # elif(cluster_method=="kmeans"):
+    #     X_pca = temp_ad.obsm[use_rep] 
+    #     kmeans = KMeans(n_clusters=num_cluster, random_state=0).fit(X_pca) 
+    #     temp_ad.obs['kmeans'] = kmeans.labels_.astype(str)
+    #     temp_ad.obs['kmeans'] = temp_ad.obs['kmeans'].astype("category")   
         
 
     return temp_ad
@@ -116,7 +121,7 @@ def call_scDML(adata: ad.AnnData, label_name='scDML_emb', verbose=False, initial
     t_fin = time.process_time()
     print(f'scDML integrate ran for: {t_fin-t_init} s')
     temp_ad.obsm[label_name] = adt.obsm["X_emb"]
-    del temp_ad.obsm['X_emb']
+    # del temp_ad.obsm['X_emb']
 
     exe_time = t_fin-t_init
     print("Adata after scDML: ", temp_ad)
@@ -205,9 +210,9 @@ def call_scVI(adata: ad.AnnData, label_name='scVI_emb', batch_key='batch', max_e
     return adata, exe_time
 
 
-def save_results_to_dataframe(dataset, algorithm, hvgs, scaled_batch, scaled_total, graph_iLISI, graph_cLISI, ARI, NMI, exe_time, dataframe=None, path='/goofys/users/Aleksandra_S/benchmarking_datasets/results/', file_name_sufix = ''):
+def save_results_to_dataframe(dataset, algorithm, hvgs, scaled_batch, scaled_total, graph_iLISI, graph_cLISI, ARI, NMI, ASW, exe_time, dataframe=None, path='/goofys/users/Aleksandra_S/benchmarking_datasets/results/', file_name_sufix = ''):
     
-    file_path = path + 'result_table.csv'
+    file_path = path + 'result_table_new.csv'
 
     if dataframe is None:
         if os.path.exists(file_path):
@@ -216,7 +221,7 @@ def save_results_to_dataframe(dataset, algorithm, hvgs, scaled_batch, scaled_tot
     if dataframe is None:
         dataframe = pd.DataFrame(columns=['dataset', 'algorithm', 'hvgs', 'scaled batch', 
         # 'scaled total', 
-        'graph iLISI', 'graph cLISI', 'ARI', 'NMI', 'Execution time'])
+        'graph iLISI', 'graph cLISI', 'ARI', 'NMI', 'ASW', 'Execution time'])
     
     results_dict = {
         'dataset': dataset,
@@ -228,6 +233,7 @@ def save_results_to_dataframe(dataset, algorithm, hvgs, scaled_batch, scaled_tot
         'graph cLISI': graph_cLISI,
         'ARI': ARI,
         'NMI': NMI,
+        'ASW': ASW,
         'Execution time': exe_time
     }
     
@@ -249,6 +255,7 @@ def main(path, params):
     # adata.obs['batch'] = adata.obs.tech
     # preprocessing the data
     adata = preprocessing(adata, norm_total= params.get('norm_total'),  log1p= params.get('log1p'), hvgs=params.get('hvgs'), flavor=params.get('flavor'), scale=params.get('scale'), scale_total=params.get('scale_total'), batch_key=params.get('batch_key'), n_comps=params.get('n_comps'))
+    print("Anndata after preprocessing: ", adata)
     # calling batch-removal method
     if params.get('algo').lower()=='harmony':
         adata, exe_time = call_harmony(adata, batch_key=params.get('batch_key'), n_comps=params.get('n_comps'), label_name=use_rep)
@@ -271,33 +278,43 @@ def main(path, params):
     #     adata = clustering(adata, reso=r)
     #     key = "louvain"
     
-    adata = clustering(adata, cluster_method=params.get('clust_algo'), reso=params.get('reso'), use_rep=use_rep)
+    # adata = clustering(adata, cluster_method=params.get('clust_algo'), reso=params.get('reso'), use_rep=use_rep)
     # calculating metrics
-    ari=adjusted_rand_score(adata.obs[params.get('clust_algo')], adata.obs[params.get('cell_type_key')])
-    nmi=normalized_mutual_info_score(adata.obs[params.get('clust_algo')],adata.obs[params.get('cell_type_key')])
+    # ari=adjusted_rand_score(adata.obs[params.get('clust_algo')], adata.obs[params.get('cell_type_key')])
+    # nmi=normalized_mutual_info_score(adata.obs[params.get('clust_algo')],adata.obs[params.get('cell_type_key')])
     clisi = scib.me.clisi_graph(adata, label_key=params.get('cell_type_key'), type_="embed", use_rep=use_rep)
-    print(f"Louvain resolution = {params.get('reso')}")
-    print(f"ARI = {ari}")
-    print(f"NMI = {nmi}")
+    # print(f"Louvain resolution = {params.get('reso')}")
+    # print(f"ARI = {ari}")
+    # print(f"NMI = {nmi}")
     print(f"cLISI = {clisi}")
 
     if params.get('algo').lower()=='scdml':
         ilisi = scib.me.ilisi_graph(adata, batch_key='BATCH', type_="embed", use_rep=use_rep, k0=graph_ilisi_k0)
+        asw = scib.me.silhouette_batch(adata, batch_key="BATCH", label_key=params.get('cell_type_key'), embed=use_rep, metric='euclidean')
     else:
         ilisi = scib.me.ilisi_graph(adata, batch_key=params.get('batch_key'), type_="embed", use_rep=use_rep, k0=graph_ilisi_k0)
+        asw = scib.me.silhouette_batch(adata, batch_key=params.get('batch_key'), label_key=params.get('cell_type_key'), embed=use_rep, metric='euclidean')
     print(f"iLISI={ilisi}")
+    print(f"ASW={asw}")
 
     print("Final andata:")
     print(adata) 
     print("Parameters: ")
     print(params)
 
-    save_results_to_dataframe(dataset=params.get('dataset'), algorithm=params.get('algo'), hvgs=params.get('hvgs'), scaled_batch=params.get('scale'), scaled_total=params.get('scale_total'), graph_iLISI=ilisi, graph_cLISI=clisi, ARI=ari, NMI=nmi, exe_time=exe_time)
+    save_results_to_dataframe(dataset=params.get('dataset'), algorithm=params.get('algo'), hvgs=params.get('hvgs'), scaled_batch=params.get('scale'), scaled_total=params.get('scale_total'), graph_iLISI=ilisi, graph_cLISI=clisi, ARI=-1, NMI=-1, ASW=asw, exe_time=exe_time)
+    # save anndata
+    hvgs_name = "_hvgs" if params.get('hvgs') else ""
+    scale_name = "_scale" if params.get('scale') else "" 
+    adt_name = params.get('dataset') + "_" + params.get('algo') + hvgs_name + scale_name
+    #adata.write_h5ad("/goofys/users/Aleksandra_S/benchmarking_datasets/results/" + adt_name + ".h5ad")
+    adata.write_h5ad("results/" + adt_name + ".h5ad")
+
 
 if __name__ == "__main__":
     params_list = [
     {
-        'algo' : 'scDML',
+        'algo' : 'scVI',
         'dataset' : 'Lung_atlas_public',
         'hvgs' : False,
         'flavor' : 'cell_ranger',
@@ -316,28 +333,28 @@ if __name__ == "__main__":
         'n_comps' : 30,
         'graph_ilisi_k0' : 63,
     },
+    # {
+    #     'algo' : 'scVI',
+    #     'dataset' : 'Lung_atlas_public',
+    #     'hvgs' : False,
+    #     'flavor' : 'cell_ranger',
+    #     'scale' : True,
+    #     'scale_total' : False,
+    #     'norm_total' : False,
+    #     'log1p' : False,
+    #     'pca' : False,
+    #     'resolutions_min' : 0.1,
+    #     'resolutions_max' : 1.1,
+    #     'resolutions_step' : 0.1,
+    #     'reso' : 1,
+    #     'clust_algo' : 'louvain',
+    #     'batch_key' : 'batch',
+    #     'cell_type_key' : 'cell_type',
+    #     'n_comps' : 30,
+    #     'graph_ilisi_k0' : 63,
+    # },
     {
-        'algo' : 'scDML',
-        'dataset' : 'Lung_atlas_public',
-        'hvgs' : False,
-        'flavor' : 'cell_ranger',
-        'scale' : True,
-        'scale_total' : False,
-        'norm_total' : False,
-        'log1p' : False,
-        'pca' : False,
-        'resolutions_min' : 0.1,
-        'resolutions_max' : 1.1,
-        'resolutions_step' : 0.1,
-        'reso' : 1,
-        'clust_algo' : 'louvain',
-        'batch_key' : 'batch',
-        'cell_type_key' : 'cell_type',
-        'n_comps' : 30,
-        'graph_ilisi_k0' : 63,
-    },
-    {
-        'algo' : 'scDML',
+        'algo' : 'scVI',
         'dataset' : 'Lung_atlas_public',
         'hvgs' : True,
         'flavor' : 'cell_ranger',
@@ -356,26 +373,26 @@ if __name__ == "__main__":
         'n_comps' : 30,
         'graph_ilisi_k0' : 63,
     },
-    {
-        'algo' : 'scDML',
-        'dataset' : 'Lung_atlas_public',
-        'hvgs' : True,
-        'flavor' : 'cell_ranger',
-        'scale' : True,
-        'scale_total' : False,
-        'norm_total' : False,
-        'log1p' : False,
-        'pca' : False,
-        'resolutions_min' : 0.1,
-        'resolutions_max' : 1.1,
-        'resolutions_step' : 0.1,
-        'reso' : 1,
-        'clust_algo' : 'louvain',
-        'batch_key' : 'batch',
-        'cell_type_key' : 'cell_type',
-        'n_comps' : 30,
-        'graph_ilisi_k0' : 63,
-    },
+    # {
+    #     'algo' : 'scVI',
+    #     'dataset' : 'Lung_atlas_public',
+    #     'hvgs' : True,
+    #     'flavor' : 'cell_ranger',
+    #     'scale' : True,
+    #     'scale_total' : False,
+    #     'norm_total' : False,
+    #     'log1p' : False,
+    #     'pca' : False,
+    #     'resolutions_min' : 0.1,
+    #     'resolutions_max' : 1.1,
+    #     'resolutions_step' : 0.1,
+    #     'reso' : 1,
+    #     'clust_algo' : 'louvain',
+    #     'batch_key' : 'batch',
+    #     'cell_type_key' : 'cell_type',
+    #     'n_comps' : 30,
+    #     'graph_ilisi_k0' : 63,
+    # },
     ]
 
     t_init = time.process_time()
